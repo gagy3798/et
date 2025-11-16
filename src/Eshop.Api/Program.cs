@@ -47,8 +47,9 @@ builder.Services.AddAutoMapper(typeof(Program));
 // Register repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-// Register the business logic service
-builder.Services.AddScoped<IProductService, ProductService>();
+// Register CQRS services (Query and Command separation)
+builder.Services.AddScoped<IProductQueryService, ProductQueryService>();
+builder.Services.AddScoped<IProductCommandService, ProductCommandService>();
 
 var app = builder.Build();
 

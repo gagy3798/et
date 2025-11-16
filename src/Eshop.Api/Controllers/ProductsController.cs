@@ -11,29 +11,29 @@ namespace Eshop.Api.Controllers;
 [Route("api/v{version:apiVersion}/products")]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductService _productService;
-    private readonly ILogger<ProductsController> _logger;
+    private readonly IProductQueryService _queryService;
+    private readonly IProductCommandService _commandService;
 
-    public ProductsController(IProductService productService, ILogger<ProductsController> logger)
+    public ProductsController(IProductQueryService queryService, IProductCommandService commandService)
     {
-        _productService = productService;
-        _logger = logger;
+        _queryService = queryService;
+        _commandService = commandService;
     }
 
     /// <summary>
     /// Gets a list of all products.
     /// </summary>
-    /// <returns>A list of products.</returns>
-    /// <response code="200">Returns the list of products.</response>
+    /// <returns>A paginated response containing all products.</returns>
+    /// <response code="200">Returns the paginated list of products.</response>
     /// <response code="500">If an internal server error occurs.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<GetProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<GetProductDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetProducts()
+    public async Task<ActionResult<PagedResponse<GetProductDto>>> GetProducts()
     {
-        // The try-catch block is no longer needed, the middleware will handle exceptions.
-        var products = await _productService.GetProductsAsync();
-        return Ok(products);
+        // V1 API returns all products by using default pageSize (int.MaxValue)
+        var response = await _queryService.GetProductsAsync();
+        return Ok(response);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GetProductDto>> GetProduct(int id)
     {
-        var product = await _productService.GetProductByIdAsync(id);
+        var product = await _queryService.GetByIdAsync(id);
         if (product == null)
         {
             return NotFound();
@@ -75,7 +75,7 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateProductDescription(int id, [FromBody] UpdateProductDescriptionDto dto)
     {
-        var wasUpdated = await _productService.UpdateProductDescriptionAsync(id, dto);
+        var wasUpdated = await _commandService.UpdateDescriptionAsync(id, dto);
         return wasUpdated ? NoContent() : NotFound();
     }
 }

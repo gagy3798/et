@@ -12,14 +12,12 @@ namespace Eshop.Api.Controllers;
 [Route("api/v{version:apiVersion}/products")]
 public class ProductsV2Controller : ControllerBase
 {
-    private readonly IProductService _productService;
-    private readonly ILogger<ProductsV2Controller> _logger;
+    private readonly IProductQueryService _queryService;
     private const int MaxPageSize = 100;
 
-    public ProductsV2Controller(IProductService productService, ILogger<ProductsV2Controller> logger)
+    public ProductsV2Controller(IProductQueryService queryService)
     {
-        _productService = productService;
-        _logger = logger;
+        _queryService = queryService;
     }
 
     /// <summary>
@@ -39,6 +37,6 @@ public class ProductsV2Controller : ControllerBase
         [FromQuery, Range(1, int.MaxValue)] int pageNumber = 1,
         [FromQuery, Range(1, MaxPageSize)] int pageSize = 10)
     {
-        return Ok(await _productService.GetProductsPaginatedAsync(pageNumber, pageSize));
+        return Ok(await _queryService.GetProductsAsync(pageNumber, pageSize));
     }
 }
