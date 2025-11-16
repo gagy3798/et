@@ -3,11 +3,14 @@ using Eshop.Api.Models;
 using Eshop.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Asp.Versioning;
 
 namespace Eshop.Api.Controllers;
 
+[ApiVersion("1.0")]
 [ApiController]
-[Route("api/[controller]")]
+[Produces("application/json")]
+[Route("api/v{version:apiVersion}/products")]
 public class ProductsController : ControllerBase
 {
     private readonly EshopDbContext _db;
@@ -25,9 +28,9 @@ public class ProductsController : ControllerBase
     /// <returns>A list of products.</returns>
     /// <response code="200">Returns the list of products.</response>
     /// <response code="500">If an internal server error occurs.</response>
-    [HttpGet(Name = "v1/products/get")]
+    [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<GetProductDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<GetProductDto>>> GetProducts()
     {
         try
@@ -53,7 +56,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns the requested product.</response>
     /// <response code="404">If the product with the given ID does not exist.</response>
     /// <response code="500">If an internal server error occurs.</response>
-    [HttpGet("{id:int}", Name = "v1/products/getById")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(GetProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -88,7 +91,7 @@ public class ProductsController : ControllerBase
     /// <response code="204">If the description was updated successfully.</response>
     /// <response code="404">If the product with the given ID does not exist.</response>
     /// <response code="500">If an internal server error occurs.</response>
-    [HttpPatch("{id:int}", Name = "v1/products/updateDescription")]
+    [HttpPatch("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
