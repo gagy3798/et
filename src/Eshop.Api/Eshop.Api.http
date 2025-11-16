@@ -2,3 +2,8 @@
 
 GET {{Eshop_Api_HostAddress}}/api/v1/products
 Accept: application/json
+
+###
+
+GET {{Eshop_Api_HostAddress}}/api/v2/products?pageNumber=-1
+Accept: application/json

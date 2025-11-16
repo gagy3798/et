@@ -15,9 +15,9 @@ public class PagedResponse<T>
     public PagedResponse(IEnumerable<T> items, int pageNumber, int pageSize, int totalCount)
     {
         Items = items;
-        PageNumber = pageNumber;
-        PageSize = pageSize;
-        TotalCount = totalCount;
-        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        PageNumber = Math.Max(1, pageNumber);
+        PageSize = Math.Max(1, pageSize);
+        TotalCount = Math.Max(0, totalCount);
+        TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
     }
 }

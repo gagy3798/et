@@ -1,22 +1,15 @@
-using Eshop.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Asp.Versioning;
-using Eshop.Api;
 using Asp.Versioning.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using Eshop.Api;
+using Eshop.Api.Data;
+using Eshop.Api.Middleware;
+using Eshop.Api.Repositories;
+using Eshop.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options =>
-{
-    var jsonInput = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
-    jsonInput.SupportedMediaTypes.Clear();
-    jsonInput.SupportedMediaTypes.Add("application/json");
-
-    var jsonOutput = options.OutputFormatters.OfType<SystemTextJsonOutputFormatter>().Single();
-    jsonOutput.SupportedMediaTypes.Clear();
-    jsonOutput.SupportedMediaTypes.Add("application/json");
-});
+builder.Services.AddControllers();
 
 // Add API Versioning services and configure them
 builder.Services.AddApiVersioning(options =>
@@ -48,8 +41,21 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<EshopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+// Register repositories
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Register the business logic service
+builder.Services.AddScoped<IProductService, ProductService>();
+
 var app = builder.Build();
+
 var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+// Add the global exception handler middleware at the beginning of the pipeline.
+app.UseMiddleware<GlobalExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

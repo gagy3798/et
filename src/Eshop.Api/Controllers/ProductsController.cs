@@ -1,9 +1,7 @@
-using Eshop.Api.Data;
-using Eshop.Api.Models;
 using Eshop.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Asp.Versioning;
+using Eshop.Api.Services;
 
 namespace Eshop.Api.Controllers;
 
@@ -13,12 +11,12 @@ namespace Eshop.Api.Controllers;
 [Route("api/v{version:apiVersion}/products")]
 public class ProductsController : ControllerBase
 {
-    private readonly EshopDbContext _db;
+    private readonly IProductService _productService;
     private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(EshopDbContext db, ILogger<ProductsController> logger)
+    public ProductsController(IProductService productService, ILogger<ProductsController> logger)
     {
-        _db = db;
+        _productService = productService;
         _logger = logger;
     }
 
@@ -33,19 +31,9 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<GetProductDto>>> GetProducts()
     {
-        try
-        {
-            var products = await _db.Products
-                .Select(p => new GetProductDto(p.Id, p.Name, p.ImgUri, p.Price, p.Description))
-                .ToListAsync();
-            
-            return Ok(products);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while retrieving products.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred. Please try again later.");
-        }
+        // The try-catch block is no longer needed, the middleware will handle exceptions.
+        var products = await _productService.GetProductsAsync();
+        return Ok(products);
     }
 
     /// <summary>
@@ -62,25 +50,13 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GetProductDto>> GetProduct(int id)
     {
-        try
+        var product = await _productService.GetProductByIdAsync(id);
+        if (product == null)
         {
-            var product = await _db.Products
-                .Where(p => p.Id == id)
-                .Select(p => new GetProductDto(p.Id, p.Name, p.ImgUri, p.Price, p.Description))
-                .FirstOrDefaultAsync();
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(product);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while retrieving product with ID {ProductId}.", id);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred. Please try again later.");
-        }
+
+        return Ok(product);
     }
 
     /// <summary>
@@ -89,28 +65,17 @@ public class ProductsController : ControllerBase
     /// <param name="id">The ID of the product to update.</param>
     /// <param name="dto">An object containing the new product description.</param>
     /// <response code="204">If the description was updated successfully.</response>
+    /// <response code="400">If the request body is invalid.</response>
     /// <response code="404">If the product with the given ID does not exist.</response>
     /// <response code="500">If an internal server error occurs.</response>
-    [HttpPatch("{id:int}")]
+    [HttpPut("{id:int}/description")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateProductDescription(int id, [FromBody] UpdateProductDescriptionDto dto)
     {
-        try
-        {
-            // Using ExecuteUpdateAsync for an efficient partial update without loading the entire entity.
-            var rowsAffected = await _db.Products
-                .Where(p => p.Id == id)
-                .ExecuteUpdateAsync(updates =>
-                    updates.SetProperty(p => p.Description, dto.Description));
-
-            return rowsAffected == 0 ? NotFound() : NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while updating product description for ID {ProductId}.", id);
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred. Please try again later.");
-        }
+        var wasUpdated = await _productService.UpdateProductDescriptionAsync(id, dto);
+        return wasUpdated ? NoContent() : NotFound();
     }
 }
