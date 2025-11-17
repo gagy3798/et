@@ -65,11 +65,23 @@ public class ProductRepository : IProductRepository
 
     public async Task<bool> UpdateDescriptionAsync(int id, string? description)
     {
-        var rowsAffected = await _context.Products
-            .Where(p => p.Id == id)
-            .ExecuteUpdateAsync(updates =>
-                updates.SetProperty(p => p.Description, description));
+        // Find the product first using AsNoTracking to avoid tracking conflicts
+        var product = await _context.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
 
-        return rowsAffected > 0;
+        if (product == null)
+        {
+            return false;
+        }
+
+        // Update the description
+        // Since Product is a record, we need to create a new instance with updated values
+        var updatedProduct = product with { Description = description };
+
+        _context.Products.Update(updatedProduct);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }

@@ -1,0 +1,13 @@
+{
+    "dotnet.defaultSolution": "EshopProductSolution.sln",
+    "dotnet.test.runSettingsFile": "${workspaceFolder}/.runsettings",
+    "dotnet.testExplorer.codeLens": true,
+    "dotnet.testExplorer.showCodeCoverage": true,
+    "coverage-gutters.coverageFileNames": [
+        "**/coverage.cobertura.xml",
+        "**/TestResults/**/coverage.cobertura.xml"
+    ],
+    "coverage-gutters.coverageBaseDir": "**",
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true
+}

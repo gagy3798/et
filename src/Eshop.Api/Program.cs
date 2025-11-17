@@ -38,8 +38,12 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Add DbContext
-builder.Services.AddDbContext<EshopDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Don't add SQL Server provider if we're in Testing environment (integration tests)
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<EshopDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -83,3 +87,6 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+// Make Program class accessible for integration tests
+public partial class Program { }

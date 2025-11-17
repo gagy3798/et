@@ -24,6 +24,6 @@ public record GetProductDto(
 /// DTO for updating a product's description.
 /// </summary>
 public record UpdateProductDescriptionDto(
-    [property: StringLength(4000)]
+    [StringLength(4000)]
     string? Description
 );
