@@ -13,8 +13,5 @@ public class ProductMappingProfile : Profile
     {
         // Map from Product entity to GetProductDto
         CreateMap<Product, GetProductDto>();
-
-        // If you need reverse mapping in the future, uncomment:
-        // CreateMap<GetProductDto, Product>();
     }
 }

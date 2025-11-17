@@ -6,7 +6,6 @@ namespace Eshop.Tests.Infrastructure;
 
 /// <summary>
 /// Seeds test data into the database using ProductMockData.
-/// This allows EASY SWITCHING between mock data and DB data:
 /// - Unit tests use ProductMockData directly with mocks
 /// - Integration tests use ProductMockData to seed the in-memory database
 /// </summary>
