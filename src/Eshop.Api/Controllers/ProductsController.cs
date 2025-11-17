@@ -68,7 +68,7 @@ public class ProductsController : ControllerBase
     /// <response code="400">If the request body is invalid.</response>
     /// <response code="404">If the product with the given ID does not exist.</response>
     /// <response code="500">If an internal server error occurs.</response>
-    [HttpPut("{id:int}/description")]
+    [HttpPatch("{id:int}/description")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

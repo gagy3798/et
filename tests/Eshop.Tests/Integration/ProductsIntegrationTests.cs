@@ -106,7 +106,7 @@ public class ProductsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var updateDto = new UpdateProductDescriptionDto("Updated description from integration test");
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/v1/products/{productId}/description", updateDto);
+        var response = await _client.PatchAsJsonAsync($"/api/v1/products/{productId}/description", updateDto);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -125,7 +125,7 @@ public class ProductsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var updateDto = new UpdateProductDescriptionDto("This should fail");
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/v1/products/{nonExistentId}/description", updateDto);
+        var response = await _client.PatchAsJsonAsync($"/api/v1/products/{nonExistentId}/description", updateDto);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -139,7 +139,7 @@ public class ProductsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var updateDto = new UpdateProductDescriptionDto(new string('x', 4001));
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/v1/products/{productId}/description", updateDto);
+        var response = await _client.PatchAsJsonAsync($"/api/v1/products/{productId}/description", updateDto);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

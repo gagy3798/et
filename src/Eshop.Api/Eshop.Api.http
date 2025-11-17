@@ -2,8 +2,17 @@
 
 GET {{Eshop_Api_HostAddress}}/api/v1/products
 Accept: application/json
-
 ###
+GET {{Eshop_Api_HostAddress}}/api/v1/products/1
+Accept: application/json
+###
+PATCH {{Eshop_Api_HostAddress}}/api/v1/products/1/description
+Accept: application/json
+Content-Type: application/json
 
-GET {{Eshop_Api_HostAddress}}/api/v2/products?pageNumber=-1
+{
+  "description": "Updated product description"
+}
+###
+GET {{Eshop_Api_HostAddress}}/api/v2/products?pageNumber=1&pageSize=2
 Accept: application/json
